@@ -1,19 +1,23 @@
 package com.example.universidadeESN3.service;
 
-import com.example.universidadeESN3.entity.Aluno;
 import com.example.universidadeESN3.entity.Professor;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IProfessorService {
 
-    Professor buscarPorId(Long id);
+    Optional<Professor> buscarPorId(Long id);
 
     List<Professor> buscarTodos();
 
+    List<Professor> buscarPorNome(String nome);
+
     Professor salvar(Professor professor);
 
-    void atualizar(Professor professor);
+    Optional<Professor> atualizar(Professor professor);
 
-    void excluir(Long id);
+    boolean excluir(Long id);
+
+    boolean desativar(Long id);
 }
