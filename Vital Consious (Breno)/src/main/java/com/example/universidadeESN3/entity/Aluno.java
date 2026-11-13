@@ -1,9 +1,25 @@
 package com.example.universidadeESN3.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Aluno {
 
@@ -14,16 +30,12 @@ public class Aluno {
     private String nome;
     @Enumerated(EnumType.STRING)
     private Genero genero;
-
     private Boolean active;
 
-    @Override
-    public String toString() {
-        return "Aluno{" +
-                "id=" + id +
-                ", matricula=" + matricula +
-                ", nome='" + nome + '\'' +
-                ", genero=" + genero +
-                '}';
+    @PrePersist
+    public void prePersist() {
+        if (this.active == null) {
+            this.active = Boolean.TRUE;
+        }
     }
 }

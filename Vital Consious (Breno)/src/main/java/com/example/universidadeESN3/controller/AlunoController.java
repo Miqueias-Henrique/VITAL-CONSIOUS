@@ -1,85 +1,76 @@
 package com.example.universidadeESN3.controller;
 
 import com.example.universidadeESN3.entity.Aluno;
-import com.example.universidadeESN3.service.AlunoService;
+import com.example.universidadeESN3.service.IAlunoService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/aluno")
+@RequiredArgsConstructor
 @Slf4j
 public class AlunoController {
 
-    @Autowired
-    private AlunoService alunoService;
+    private final IAlunoService alunoService;
 
     @GetMapping
-    public ResponseEntity<List<Aluno>> buscarTodos() {
+    public ResponseEntity<List<Aluno>> listarTodos() {
         return ResponseEntity.ok(alunoService.buscarTodos());
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<Aluno> buscarPorId(@PathVariable Long id){
-
-        Aluno response = alunoService.buscarPorId(id);
-        if (response != null) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.notFound().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<Aluno> buscarPorId(@PathVariable Long id) {
+        return alunoService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping(path = "/nome/{nome}")
-    public ResponseEntity<List<Aluno>> buscarPorNome(@PathVariable String nome){
-
-        List<Aluno> response = alunoService.buscarPorNome(nome);
-        if (response != null && !response.isEmpty()) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.ok(new ArrayList<>());
+    @GetMapping("/nome/{nome}")
+    public ResponseEntity<List<Aluno>> buscarPorNome(@PathVariable String nome) {
+        return ResponseEntity.ok(alunoService.buscarPorNome(nome));
     }
 
     @PostMapping
-    public ResponseEntity<Aluno> salvarAluno(@RequestBody Aluno aluno){
-        log.info("salvarAluno() - aluno:{}", aluno );
-        return ResponseEntity.ok(alunoService.salvar(aluno));
+    public ResponseEntity<Aluno> criar(@RequestBody Aluno aluno) {
+        log.info("criar() - aluno: {}", aluno);
+        return ResponseEntity.status(HttpStatus.CREATED).body(alunoService.salvar(aluno));
     }
 
-    @PutMapping()
-    public ResponseEntity<?> update(@RequestBody Aluno aluno){
-
-        Aluno response = alunoService.buscarPorId(aluno.getId());
-        if (response == null) {
-            return ResponseEntity.notFound().build();
+    @PutMapping
+    public ResponseEntity<Aluno> atualizar(@RequestBody Aluno aluno) {
+        if (aluno.getId() == null) {
+            return ResponseEntity.badRequest().build();
         }
-        alunoService.atualizar(aluno);
-        return ResponseEntity.ok(null);
+        return alunoService.atualizar(aluno)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        Aluno response = alunoService.buscarPorId(id);
-        if (response == null) {
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        if (!alunoService.excluir(id)) {
             return ResponseEntity.notFound().build();
         }
-        alunoService.excluir(id);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/inactive/{id}")
-    public ResponseEntity<?> desativar(@PathVariable Long id) {
-        Aluno response = alunoService.buscarPorId(id);
-        if (response == null) {
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+        if (!alunoService.desativar(id)) {
             return ResponseEntity.notFound().build();
         }
-        alunoService.desativar(response);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
-
-
 }
