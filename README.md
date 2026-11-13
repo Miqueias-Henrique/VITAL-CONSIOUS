@@ -1,4 +1,4 @@
-# VITAL-CONSIOUS
+# vital-conscious-api
 
 Repositório acadêmico da disciplina de Engenharia de Software (UNIFAN, turma ESNB-3), reunindo a documentação do projeto (diagramas e Plano de Desenvolvimento de Software) e a API REST em Spring Boot para cadastro e gestão de alunos e professores.
 
